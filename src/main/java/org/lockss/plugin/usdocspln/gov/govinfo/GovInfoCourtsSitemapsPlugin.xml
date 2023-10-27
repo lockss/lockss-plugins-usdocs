@@ -1,0 +1,165 @@
+<!--
+
+Copyright (c) 2000-2023, Board of Trustees of Leland Stanford Jr. University
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+may be used to endorse or promote products derived from this software without
+specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+-->
+<map>
+  <entry>
+    <string>plugin_status</string>
+    <string>ready</string>
+  </entry>
+  <entry>
+    <string>plugin_identifier</string>
+    <string>org.lockss.plugin.usdocspln.gov.govinfo.GovInfoCourtsSitemapsPlugin</string>
+  </entry>
+  <entry>
+    <string>plugin_version</string>
+    <string>20</string>
+  </entry>
+  <entry>
+    <string>plugin_parent</string>
+    <string>org.lockss.plugin.usdocspln.gov.govinfo.GovInfoSitemapsPlugin</string>
+  </entry>
+  <entry>
+    <string>plugin_parent_version</string>
+    <string>22</string>
+  </entry>
+  <entry>
+    <string>plugin_feature_version_map</string>
+    <map>
+      <entry>
+        <string>Poll</string>
+        <string>5</string>
+      </entry>
+      <entry>
+        <string>Substance</string>
+        <string>3</string>
+      </entry>
+      <entry>
+        <string>Metadata</string>
+        <string>1</string>
+      </entry>
+    </map>
+  </entry>
+  <entry>
+    <string>plugin_name</string>
+    <string>GovInfo Sitemaps Plugin (US Courts)</string>
+  </entry>
+  <entry>
+    <string>plugin_config_props</string>
+    <list>
+      <org.lockss.daemon.ConfigParamDescr>
+        <key>base_url</key>
+        <displayName>Base URL</displayName>
+        <description>Usually of the form http://&lt;journal-name&gt;.com/</description>
+        <type>3</type>
+        <size>40</size>
+        <definitional>true</definitional>
+        <defaultOnly>false</defaultOnly>
+      </org.lockss.daemon.ConfigParamDescr>
+      <org.lockss.daemon.ConfigParamDescr>
+        <key>collection_id</key>
+        <displayName>Collection Identifier</displayName>
+        <description>A short code identifying the top-level collection, e.g. FR for the Federal Register. Case-sensitive.</description>
+        <type>1</type>
+        <size>20</size>
+        <definitional>true</definitional>
+        <defaultOnly>false</defaultOnly>
+      </org.lockss.daemon.ConfigParamDescr>
+      <org.lockss.daemon.ConfigParamDescr>
+        <key>court_id</key>
+        <displayName>Court ID</displayName>
+        <description>Court Identifier</description>
+        <type>1</type>
+        <size>20</size>
+        <definitional>true</definitional>
+        <defaultOnly>false</defaultOnly>
+      </org.lockss.daemon.ConfigParamDescr>
+      <org.lockss.daemon.ConfigParamDescr>
+        <key>year</key>
+        <displayName>Year</displayName>
+        <description>Four digit year (e.g., 2004)</description>
+        <type>4</type>
+        <size>4</size>
+        <definitional>true</definitional>
+        <defaultOnly>false</defaultOnly>
+      </org.lockss.daemon.ConfigParamDescr>
+    </list>
+  </entry>
+  <entry>
+    <string>au_name</string>
+    <string>"GovInfo Sitemaps Plugin (US Courts), Base URL %s, Collection ID %s, Year %d", base_url, collection_id, year</string>
+  </entry>
+  <entry>
+    <string>au_start_url</string>
+      <!--https://www.govinfo.gov/sitemap/USCOURTS/USCOURTS_akd_2014_sitemap.xml-->
+      <string>"%ssitemap/USCOURTS/%s_%s_%d_sitemap.xml", base_url, collection_id, court_id, year</string>
+  </entry>
+  <entry>
+    <string>au_crawlrules</string>
+    <list>
+      <!--
+      implicit < status ; year ; name ; param[collection_id] ; param[court_id] ; param[year] >
+      au < manifest ; 2014 ; USCOURTS_akd 2014 ; USCOURTS ; akd ; 2014 >
+      https://www.govinfo.gov/sitemap/USCOURTS/USCOURTS_akd_2014_sitemap.xml
+      https://www.govinfo.gov/app/details/USCOURTS-akd-3_08-cv-00162
+      https://www.govinfo.gov/content/pkg/USCOURTS-akd-1_06-cv-00009.zip
+      https://www.govinfo.gov/metadata/pkg/USCOURTS-akd-1_06-cv-00009/mods.xml
+      https://www.govinfo.gov/metadata/pkg/USCOURTS-akd-1_06-cv-00009/premis.xml
+      -->
+      <string>2,"^%scontent/pkg/[^/]+\.zip$", base_url</string>
+      <string>1,"^%s(content|metadata)/pkg/%s-%s", base_url, collection_id, court_id</string>
+      <!-- This is a legitimate URL... -->
+      <string>1,"^%sapp/dynamic/stylesheets/bootstrap/bootstrap\.min\.css", base_url</string>
+      <!-- ...with incorrect relative URLs to ancillary files and error pages are served as 200 ad infinitum -->
+      <string>2,"^%sapp/(details/lib/bootstrap|dynamic/stylesheets)/", base_url</string>
+      <string>1,"^%sapp/details/%s-%s", base_url, collection_id, court_id</string>
+      <!-- these file extensions are used in GovInfoSitemapsHttpResponseHandler for 504 Non-fatal exceptions
+           if you add to them here, the pattern there should be updated as well
+       -->
+      <string>1,"^https?://(%s|maxcdn\.bootstrapcdn\.com)/[^?]*\.(bmp|css|eot|gif|ico|jpe?g|js|png|svg|tif?f|ttc|ttf|woff.?|dfont|otf)", url_host(base_url)</string>
+      <!-- https://fonts.googleapis.com/css?family=Lato:700%7CRoboto:400,700 -->
+      <string>1,"^https?://fonts\.googleapis\.com/css\?"</string>
+    </list>
+  </entry>
+  <entry>
+    <string>au_substance_url_pattern</string>
+    <list>
+      <string>"content/pkg/(%s-%s[^/]+)/pdf/\1[^/]+\.pdf$", collection_id, court_id</string>
+    </list>
+  </entry>
+  <entry>
+    <string>plugin_article_iterator_factory</string>
+    <string>org.lockss.plugin.usdocspln.gov.govinfo.GovInfoCourtsSitemapsArticleIteratorFactory</string>
+  </entry>
+  <entry>
+    <string>plugin_article_metadata_extractor_factory</string>
+    <string>org.lockss.plugin.usdocspln.gov.govinfo.GovInfoCourtsSitemapsArticleIteratorFactory</string>
+  </entry>
+</map>
